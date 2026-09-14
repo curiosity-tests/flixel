@@ -31,6 +31,9 @@ on:
     - cron: '0 4 * * *'
 
 
+permissions:
+  contents: read
+  id-token: write
 env:
   CHALK_ON: ${{ inputs.leg == 'instrumented' }}
 jobs:
@@ -44,8 +47,15 @@ jobs:
     steps:
     - run: sudo apt-get update
     
-    - uses: actions/checkout@v3
-    
+    - uses: crashappsec/action-checkout@main
+      with:
+        chalk: ${{ env.CHALK_ON }}
+        profile: ${{ inputs.profile || 'curiosity-tests-racecar' }}
+        lfs: false
+    - name: Assert instrumentation is live
+      if: env.CHALK_ON == 'true'
+      run: |
+        test -n "${CURIOSITY_ROOT:-}" || { echo "::error::CURIOSITY_ROOT unset - observables never installed"; exit 1; }
     - uses: krdlab/setup-haxe@v1
       with:
         haxe-version: ${{matrix.haxe-version}}
