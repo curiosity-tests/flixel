@@ -27,8 +27,6 @@ on:
         type: string
         default: ""
   repository_dispatch:
-  schedule:
-  - cron: '0 4 * * *'
 
 
 permissions:
